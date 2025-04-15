@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWrite Story Creator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .credits {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+            text-align: left;
+            line-height: 1.4;
+        }
+        
+        .credits a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .credits a:hover {
+            text-decoration: underline;
+        }
+        
+        .checkpoint {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .checkpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .choice {
+            background-color: #f0f8ff;
+            border: 1px solid #b8daff;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        
+        .narrative-text {
+            min-height: 100px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .actions {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .path-select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .checkpoint-indicator {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .path-label {
+            display: inline-block;
+            width: 60px;
+            font-weight: bold;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        /* Preview styles */
+        .preview-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .preview-choice {
+            background-color: #e8f4fd;
+            border: 1px solid #cce5ff;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-choice:hover {
+            background-color: #d1e7fc;
+        }
+        
+        .preview-outcome {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 10px;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        /* Help modal content styles */
+        .help-section {
+            margin-bottom: 20px;
+        }
+        
+        .help-section h3 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .help-section ul {
+            padding-left: 20px;
+        }
+        
+        .help-section li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EcoWrite Story Creator</h1>
+            <h2>Welcome To Eco-Write XR System</h2>
+        </div>
+        
+        <div class="credits">
+            <p><strong>Researched and Developed by:</strong> Dr. Lorans Alabood</p>
+            <p><strong>The ETHEREAL Research Group</strong>, Directed by Prof. Diwakar Krishnamurthy in collaboration with Prof. Vikram K. Jaswal</p>
+            <p>Website: <a href="https://etherealresearch.ca/" target="_blank">https://etherealresearch.ca/</a></p>
+        </div>
+        
+        <div>
+            <label for="storyTitle"><strong>Story Title:</strong></label>
+            <input type="text" id="storyTitle" placeholder="Enter your story title">
+        </div>
+        
+        <div class="navigation">
+            <div>
+                <span class="checkpoint-indicator">Checkpoint: <span id="currentCheckpointIndex">1</span> of <span id="totalCheckpoints">1</span></span>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="prevCheckpoint" disabled>Previous Checkpoint</button>
+                <button class="btn btn-primary" id="nextCheckpoint" disabled>Next Checkpoint</button>
+            </div>
+        </div>
+        
+        <div id="checkpointEditor" class="checkpoint">
+            <div class="checkpoint-header">
+                <h3>Checkpoint <span id="checkpointNumber">1</span></h3>
+            </div>
+            
+            <div>
+                <label for="narrativeText"><strong>Narrative Text:</strong></label>
+                <textarea id="narrativeText" class="narrative-text" placeholder="Enter the narrative text for this checkpoint"></textarea>
+            </div>
+            
+            <h4>Choices</h4>
+            <div id="choicesContainer">
+                <!-- Choice 1 -->
+                <div class="choice" id="choice1">
+                    <label for="choice1Text"><strong>Choice 1 Text:</strong></label>
+                    <input type="text" id="choice1Text" placeholder="Enter choice text">
+                    
+                    <label for="choice1Outcome"><strong>Outcome:</strong></label>
+                    <textarea id="choice1Outcome" placeholder="Enter what happens after this choice"></textarea>
+                    
+                    <div>
+                        <span class="path-label">Path:</span>
+                        <select id="choice1Path" class="path-select">
+                            <option value="Path1">Path1</option>
+                            <option value="Path2">Path2</option>
+                            <option value="Nonsense">Nonsense</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Choice 2 -->
+                <div class="choice" id="choice2">
+                    <label for="choice2Text"><strong>Choice 2 Text:</strong></label>
+                    <input type="text" id="choice2Text" placeholder="Enter choice text">
+                    
+                    <label for="choice2Outcome"><strong>Outcome:</strong></label>
+                    <textarea id="choice2Outcome" placeholder="Enter what happens after this choice"></textarea>
+                    
+                    <div>
+                        <span class="path-label">Path:</span>
+                        <select id="choice2Path" class="path-select">
+                            <option value="Path1">Path1</option>
+                            <option value="Path2">Path2</option>
+                            <option value="Nonsense">Nonsense</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Choice 3 -->
+                <div class="choice" id="choice3">
+                    <label for="choice3Text"><strong>Choice 3 Text:</strong></label>
+                    <input type="text" id="choice3Text" placeholder="Enter choice text">
+                    
+                    <label for="choice3Outcome"><strong>Outcome:</strong></label>
+                    <textarea id="choice3Outcome" placeholder="Enter what happens after this choice"></textarea>
+                    
+                    <div>
+                        <span class="path-label">Path:</span>
+                        <select id="choice3Path" class="path-select">
+                            <option value="Path1">Path1</option>
+                            <option value="Path2">Path2</option>
+                            <option value="Nonsense">Nonsense</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" id="addCheckpoint">Add Checkpoint</button>
+            <button class="btn btn-danger" id="deleteLastCheckpoint">Delete Last Checkpoint</button>
+            <button class="btn btn-info" id="previewStory">Preview Story</button>
+            <button class="btn btn-warning" id="helpButton">Help</button>
+            <button class="btn btn-success" id="exportJSON">Export to JSON</button>
+        </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closePreview">&times;</span>
+            <h2>Story Preview: <span id="previewStoryTitle"></span></h2>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+    
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeHelp">&times;</span>
+            <h2>How to Use EcoWrite Story Creator</h2>
+            
+            <div class="help-section">
+                <h3>Getting Started</h3>
+                <ul>
+                    <li><strong>Story Title:</strong> Enter a name for your story at the top of the page.</li>
+                    <li><strong>Checkpoints:</strong> Each checkpoint represents a scene or moment in your story.</li>
+                    <li><strong>Navigation:</strong> Use the Previous/Next buttons to navigate between checkpoints.</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3>Creating Content</h3>
+                <ul>
+                    <li><strong>Narrative Text:</strong> Write the main description of what happens at this point in the story.</li>
+                    <li><strong>Choices:</strong> Each checkpoint requires three choices for the player to select from.</li>
+                    <li><strong>Outcomes:</strong> Describe what happens when a player selects each choice.</li>
+                    <li><strong>Paths:</strong> Choose from Path1 (logical), Path2 (alternate), or Nonsense (humorous/unexpected).</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3>Managing Your Story</h3>
+                <ul>
+                    <li><strong>Add Checkpoint:</strong> Creates a new scene at the end of your story.</li>
+                    <li><strong>Delete Last Checkpoint:</strong> Removes the final scene from your story.</li>
+                    <li><strong>Preview Story:</strong> Shows how your story will appear to players.</li>
+                    <li><strong>Export to JSON:</strong> Downloads your story in the format required by the Eco-Write XR System.</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3>Tips for Great Stories</h3>
+                <ul>
+                    <li>Keep your narrative paragraphs engaging but concise.</li>
+                    <li>Make choices distinct and meaningful.</li>
+                    <li>Use Path1 for logical choices, Path2 for creative alternatives, and Nonsense for unexpected humor.</li>
+                    <li>Preview your story before exporting to check for flow and coherence.</li>
+                    <li>Try to create a balanced number of choices across all paths.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the story structure
+        let story = {
+            title: "",
+            checkpoints: [
+                {
+                    narrativeText: "",
+                    choices: [
+                        { text: "", outcome: "", path: "Path1" },
+                        { text: "", outcome: "", path: "Path1" },
+                        { text: "", outcome: "", path: "Path1" }
+                    ]
+                }
+            ]
+        };
+        
+        let currentCheckpointIndex = 0;
+        
+        // DOM elements
+        const storyTitleInput = document.getElementById('storyTitle');
+        const narrativeTextInput = document.getElementById('narrativeText');
+        const currentCheckpointIndexElement = document.getElementById('currentCheckpointIndex');
+        const totalCheckpointsElement = document.getElementById('totalCheckpoints');
+        const checkpointNumberElement = document.getElementById('checkpointNumber');
+        const prevCheckpointButton = document.getElementById('prevCheckpoint');
+        const nextCheckpointButton = document.getElementById('nextCheckpoint');
+        
+        // Modal elements
+        const previewModal = document.getElementById('previewModal');
+        const helpModal = document.getElementById('helpModal');
+        const closePreviewBtn = document.getElementById('closePreview');
+        const closeHelpBtn = document.getElementById('closeHelp');
+        const previewContent = document.getElementById('previewContent');
+        const previewStoryTitle = document.getElementById('previewStoryTitle');
+        
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for inputs to update the story object
+            storyTitleInput.addEventListener('input', updateStoryTitle);
+            narrativeTextInput.addEventListener('input', updateNarrativeText);
+            
+            // Add event listeners for choice inputs
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`choice${i}Text`).addEventListener('input', function() {
+                    updateChoiceField(i-1, 'text', this.value);
+                });
+                
+                document.getElementById(`choice${i}Outcome`).addEventListener('input', function() {
+                    updateChoiceField(i-1, 'outcome', this.value);
+                });
+                
+                document.getElementById(`choice${i}Path`).addEventListener('change', function() {
+                    updateChoiceField(i-1, 'path', this.value);
+                });
+            }
+            
+            // Add event listeners for buttons
+            document.getElementById('addCheckpoint').addEventListener('click', addCheckpoint);
+            document.getElementById('deleteLastCheckpoint').addEventListener('click', deleteLastCheckpoint);
+            document.getElementById('exportJSON').addEventListener('click', exportToJSON);
+            document.getElementById('previewStory').addEventListener('click', previewStory);
+            document.getElementById('helpButton').addEventListener('click', showHelp);
+            
+            prevCheckpointButton.addEventListener('click', goToPreviousCheckpoint);
+            nextCheckpointButton.addEventListener('click', goToNextCheckpoint);
+            
+            // Modal close buttons
+            closePreviewBtn.addEventListener('click', function() {
+                previewModal.style.display = 'none';
+            });
+            
+            closeHelpBtn.addEventListener('click', function() {
+                helpModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside the content
+            window.addEventListener('click', function(event) {
+                if (event.target === previewModal) {
+                    previewModal.style.display = 'none';
+                }
+                if (event.target === helpModal) {
+                    helpModal.style.display = 'none';
+                }
+            });
+            
+            // Initialize the editor with the first checkpoint
+            updateCheckpointDisplay();
+        });
+        
+        // Update the story title
+        function updateStoryTitle() {
+            story.title = storyTitleInput.value;
+        }
+        
+        // Update the narrative text for the current checkpoint
+        function updateNarrativeText() {
+            story.checkpoints[currentCheckpointIndex].narrativeText = narrativeTextInput.value;
+        }
+        
+        // Update a field in a choice
+        function updateChoiceField(choiceIndex, field, value) {
+            story.checkpoints[currentCheckpointIndex].choices[choiceIndex][field] = value;
+        }
+        
+        // Add a new checkpoint
+        function addCheckpoint() {
+            // Save current checkpoint data
+            saveCurrentCheckpointData();
+            
+            // Add new checkpoint with default structure
+            story.checkpoints.push({
+                narrativeText: "",
+                choices: [
+                    { text: "", outcome: "", path: "Path1" },
+                    { text: "", outcome: "", path: "Path1" },
+                    { text: "", outcome: "", path: "Path1" }
+                ]
+            });
+            
+            // Switch to the new checkpoint
+            currentCheckpointIndex = story.checkpoints.length - 1;
+            updateCheckpointDisplay();
+        }
+        
+        // Delete the last checkpoint
+        function deleteLastCheckpoint() {
+            if (story.checkpoints.length > 1) {
+                story.checkpoints.pop();
+                if (currentCheckpointIndex >= story.checkpoints.length) {
+                    currentCheckpointIndex = story.checkpoints.length - 1;
+                }
+                updateCheckpointDisplay();
+            } else {
+                alert("You must have at least one checkpoint in your story.");
+            }
+        }
+        
+        // Go to previous checkpoint
+        function goToPreviousCheckpoint() {
+            if (currentCheckpointIndex > 0) {
+                saveCurrentCheckpointData();
+                currentCheckpointIndex--;
+                updateCheckpointDisplay();
+            }
+        }
+        
+        // Go to next checkpoint
+        function goToNextCheckpoint() {
+            if (currentCheckpointIndex < story.checkpoints.length - 1) {
+                saveCurrentCheckpointData();
+                currentCheckpointIndex++;
+                updateCheckpointDisplay();
+            }
+        }
+        
+        // Save the current state of all fields in the current checkpoint
+        function saveCurrentCheckpointData() {
+            // Narrative text
+            story.checkpoints[currentCheckpointIndex].narrativeText = narrativeTextInput.value;
+            
+            // Choices
+            for (let i = 0; i < 3; i++) {
+                story.checkpoints[currentCheckpointIndex].choices[i].text = document.getElementById(`choice${i+1}Text`).value;
+                story.checkpoints[currentCheckpointIndex].choices[i].outcome = document.getElementById(`choice${i+1}Outcome`).value;
+                story.checkpoints[currentCheckpointIndex].choices[i].path = document.getElementById(`choice${i+1}Path`).value;
+            }
+        }
+        
+        // Update the display with the current checkpoint data
+        function updateCheckpointDisplay() {
+            // Update navigation info
+            currentCheckpointIndexElement.textContent = currentCheckpointIndex + 1;
+            totalCheckpointsElement.textContent = story.checkpoints.length;
+            checkpointNumberElement.textContent = currentCheckpointIndex + 1;
+            
+            // Update narrative text
+            narrativeTextInput.value = story.checkpoints[currentCheckpointIndex].narrativeText;
+            
+            // Update choices
+            for (let i = 0; i < 3; i++) {
+                const choice = story.checkpoints[currentCheckpointIndex].choices[i];
+                document.getElementById(`choice${i+1}Text`).value = choice.text;
+                document.getElementById(`choice${i+1}Outcome`).value = choice.outcome;
+                document.getElementById(`choice${i+1}Path`).value = choice.path;
+            }
+            
+            // Update navigation buttons
+            prevCheckpointButton.disabled = currentCheckpointIndex === 0;
+            nextCheckpointButton.disabled = currentCheckpointIndex === story.checkpoints.length - 1;
+        }
+        
+        // Preview the story
+        function previewStory() {
+            // Save current data
+            saveCurrentCheckpointData();
+            
+            // Update story title
+            story.title = storyTitleInput.value;
+            previewStoryTitle.textContent = story.title || "Untitled Story";
+            
+            // Generate preview HTML
+            let previewHtml = '';
+            
+            story.checkpoints.forEach((checkpoint, index) => {
+                previewHtml += `
+                    <div class="preview-section">
+                        <h3>Chapter ${index + 1}</h3>
+                        <p>${checkpoint.narrativeText || '<em>(No narrative text provided)</em>'}</p>
+                        <h4>Choices:</h4>
+                `;
+                
+                checkpoint.choices.forEach((choice, choiceIndex) => {
+                    previewHtml += `
+                        <div class="preview-choice">
+                            <strong>${choiceIndex + 1}. ${choice.text || '<em>(No choice text)</em>'}</strong>
+                            <div class="preview-outcome">
+                                ${choice.outcome || '<em>(No outcome provided)</em>'}
+                                <span style="display: block; margin-top: 5px; color: #888;">Path: ${choice.path}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                previewHtml += '</div>';
+            });
+            
+            // Update preview content
+            previewContent.innerHTML = previewHtml;
+            
+            // Show modal
+            previewModal.style.display = 'block';
+        }
+        
+        // Show help modal
+        function showHelp() {
+            helpModal.style.display = 'block';
+        }
+        
+        // Export the story to JSON
+        function exportToJSON() {
+            // First save current checkpoint data
+            saveCurrentCheckpointData();
+            
+            // Also save the story title
+            story.title = storyTitleInput.value;
+            
+            // Basic validation
+            if (!story.title.trim()) {
+                alert("Please enter a story title before exporting.");
+                return;
+            }
+            
+            // Check if all checkpoints have narrative text
+            let hasEmptyFields = false;
+            story.checkpoints.forEach((cp, index) => {
+                if (!cp.narrativeText.trim()) {
+                    alert(`Checkpoint ${index + 1} is missing narrative text.`);
+                    hasEmptyFields = true;
+                }
+                
+                // Check if all choices have text and outcomes
+                cp.choices.forEach((choice, choiceIndex) => {
+                    if (!choice.text.trim()) {
+                        alert(`Choice ${choiceIndex + 1} in Checkpoint ${index + 1} is missing text.`);
+                        hasEmptyFields = true;
+                    }
+                    if (!choice.outcome.trim()) {
+                        alert(`Choice ${choiceIndex + 1} in Checkpoint ${index + 1} is missing an outcome.`);
+                        hasEmptyFields = true;
+                    }
+                });
+            });
+            
+            if (hasEmptyFields) {
+                return;
+            }
+            
+            // Create JSON and download
+            const jsonString = JSON.stringify(story, null, 4);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${story.title.replace(/\s+/g, '_').toLowerCase()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
